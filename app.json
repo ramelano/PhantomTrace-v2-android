@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "PhantomTrace",
+    "slug": "phantomtrace-v2",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "backgroundColor": "#0f0f14",
+    "newArchEnabled": false,
+    "android": {
+      "package": "com.hakan.phantomtrace"
+    },
+    "plugins": ["expo-sqlite"]
+  }
+}

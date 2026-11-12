@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+android/
+ios/
+dist/
+*.apk
+*.db
+phantomtrace.db
+*.sqlite3
+__pycache__/
+venv/
+.env

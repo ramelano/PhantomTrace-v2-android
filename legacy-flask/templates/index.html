@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-6">Taranan Profiller</h1>
+
+{% if items %}
+<div class="overflow-hidden rounded-xl border border-zinc-800">
+  <table class="w-full text-sm">
+    <thead class="bg-zinc-900 text-zinc-400 text-left">
+      <tr>
+        <th class="px-4 py-3">Profil</th>
+        <th class="px-4 py-3">Son tarama</th>
+        <th class="px-4 py-3 text-right">Takipçi</th>
+        <th class="px-4 py-3 text-right">Takip</th>
+        <th class="px-4 py-3 text-right">Tarama</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-800">
+      {% for it in items %}
+      <tr class="hover:bg-zinc-900/70">
+        <td class="px-4 py-3">
+          <a class="font-medium text-violet-300 hover:underline" href="{{ url_for('profile_view', profile_id=it.profile.id) }}">@{{ it.profile.username }}</a>
+        </td>
+        <td class="px-4 py-3 text-zinc-400">{{ it.last.taken_at.strftime('%d.%m.%Y %H:%M') if it.last else '-' }}</td>
+        <td class="px-4 py-3 text-right">{{ it.last.followers_count if it.last and it.last.has_followers else '-' }}</td>
+        <td class="px-4 py-3 text-right">{{ it.last.following_count if it.last and it.last.has_following else '-' }}</td>
+        <td class="px-4 py-3 text-right text-zinc-400">{{ it.scan_count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="rounded-xl border border-dashed border-zinc-700 p-10 text-center text-zinc-400">
+  Henüz tarama yok. Instagram'da bir profili açıp <code class="text-violet-300">phantom_script.js</code> kodunu konsola yapıştır.
+</div>
+{% endif %}
+
+<section class="mt-10 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+  <h2 class="font-semibold mb-1">Manuel yükleme (yedek yol)</h2>
+  <p class="text-sm text-zinc-400 mb-3">Script veriyi sunucuya gönderemezse JSON dosyası indirir; buradan yükleyebilirsin.</p>
+  <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="flex flex-wrap items-center gap-3">
+    <input type="file" name="file" accept=".json,application/json" required
+           class="text-sm text-zinc-300 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-2 file:text-zinc-200 hover:file:bg-zinc-700">
+    <button class="rounded-md bg-violet-600 hover:bg-violet-500 px-4 py-2 text-sm font-medium text-white">Yükle</button>
+  </form>
+</section>
+{% endblock %}

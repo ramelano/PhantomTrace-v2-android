@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}@{{ profile.username }} • PhantomTrace{% endblock %}
+
+{% macro user_list(title, users, tone) %}
+<section class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+  <h3 class="font-semibold {{ tone }}">{{ title }} <span class="text-zinc-500 text-sm font-normal">({{ users|length }})</span></h3>
+  {% if users %}
+  <ul class="mt-3 max-h-96 overflow-auto divide-y divide-zinc-800">
+    {% for u in users %}
+    <li class="py-2 flex items-center justify-between gap-3">
+      <a class="hover:underline" target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/{{ u.username }}/">@{{ u.username }}</a>
+      <span class="text-zinc-500 text-sm truncate">{{ u.full_name }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="mt-3 text-sm text-zinc-500">Değişiklik yok.</p>
+  {% endif %}
+</section>
+{% endmacro %}
+
+{% macro group(heading, d, add_title, rem_title) %}
+<div class="mt-8">
+  <h2 class="text-lg font-semibold mb-1">{{ heading }}</h2>
+  {% if d.status == 'missing' %}
+    <p class="text-sm text-zinc-500">Bu taramada bu liste çekilmedi.</p>
+  {% elif d.status == 'baseline' %}
+    <p class="text-sm text-zinc-500">İlk tarama: kıyaslanacak önceki veri yok. Bir sonraki taramadan sonra farklar görünecek.</p>
+  {% else %}
+    <p class="text-xs text-zinc-500 mb-3">Kıyas: {{ d.prev.taken_at.strftime('%d.%m.%Y %H:%M') }} taramasına göre</p>
+    <div class="grid gap-4 md:grid-cols-2">
+      {{ user_list(add_title, d.added, 'text-emerald-400') }}
+      {{ user_list(rem_title, d.removed, 'text-red-400') }}
+    </div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <a href="https://www.instagram.com/{{ profile.username }}/" target="_blank" rel="noopener noreferrer"
+       class="text-2xl font-semibold text-violet-300 hover:underline">@{{ profile.username }}</a>
+    <p class="text-sm text-zinc-400 mt-1">
+      {% if snap.id == history[0].id %}En son tarama{% else %}Seçili tarama{% endif %}:
+      <span class="text-zinc-200">{{ snap.taken_at.strftime('%d.%m.%Y %H:%M:%S') }}</span>
+    </p>
+  </div>
+  <form method="get">
+    <select name="snapshot" onchange="this.form.submit()"
+            class="rounded-md bg-zinc-900 border border-zinc-700 px-3 py-2 text-sm">
+      {% for h in history %}
+        <option value="{{ h.id }}" {{ 'selected' if h.id == snap.id }}>
+          {{ h.taken_at.strftime('%d.%m.%Y %H:%M') }}{{ ' (en son)' if loop.first }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+<div class="grid grid-cols-2 gap-4 mt-6">
+  <div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+    <div class="text-xs text-zinc-500">Takipçi</div>
+    <div class="text-2xl font-bold">{{ snap.followers_count if snap.has_followers else '-' }}</div>
+    {% if snap.has_followers and snap.reported_followers is not none and snap.reported_followers != snap.followers_count %}
+      <div class="text-xs text-amber-400 mt-1">Instagram'ın bildirdiği: {{ snap.reported_followers }}</div>
+    {% endif %}
+  </div>
+  <div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+    <div class="text-xs text-zinc-500">Takip edilen</div>
+    <div class="text-2xl font-bold">{{ snap.following_count if snap.has_following else '-' }}</div>
+    {% if snap.has_following and snap.reported_following is not none and snap.reported_following != snap.following_count %}
+      <div class="text-xs text-amber-400 mt-1">Instagram'ın bildirdiği: {{ snap.reported_following }}</div>
+    {% endif %}
+  </div>
+</div>
+
+{{ group('Takip Edilenler (Following)', deltas.following, 'Yeni takip ettikleri', 'Takipten çıkardıkları') }}
+{{ group('Takipçiler (Followers)', deltas.followers, 'Yeni takipçileri', 'Takibi bırakanlar') }}
+{% endblock %}

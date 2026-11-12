@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PhantomTrace{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{color-scheme:dark}</style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 min-h-screen">
+  <header class="border-b border-zinc-800 bg-zinc-900/60 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="{{ url_for('index') }}" class="text-xl font-bold tracking-tight">
+        <span class="text-violet-400">Phantom</span>Trace
+      </a>
+      <span class="text-xs text-zinc-500">lokal • oturum tabanlı • şifresiz</span>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="mb-4 rounded-lg border px-4 py-3 text-sm {{ 'border-emerald-700 bg-emerald-950/40 text-emerald-300' if cat == 'ok' else 'border-red-800 bg-red-950/40 text-red-300' }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% if error %}
+      <div class="mb-4 rounded-lg border border-red-800 bg-red-950/40 text-red-300 px-4 py-3 text-sm">{{ error }}</div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

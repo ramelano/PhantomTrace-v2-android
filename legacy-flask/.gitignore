@@ -1,0 +1,4 @@
+phantomtrace.db
+.venv/
+__pycache__/
+*.json
